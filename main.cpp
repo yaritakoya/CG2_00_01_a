@@ -158,7 +158,6 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
 	// 頂点リソース用のヒープの設定
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD; // UploadHeapを使う
-
 	// 頂点リソースの設定
 	D3D12_RESOURCE_DESC vertexResourceDesc{};
 	// バッファリソース。テクスチャの場合はまた別の設定をする
@@ -171,7 +170,6 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
 	vertexResourceDesc.SampleDesc.Count = 1;
 	// バッファの場合はこれにする決まり
 	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
 	// 実際に頂点リソースを作る
 	ID3D12Resource* vertexResource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResource));
@@ -400,18 +398,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags =
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	// RootParameter作成。複数設定できるので配列。今回は結果が１つなので長さ１の配列
 	D3D12_ROOT_PARAMETER rootParameters[1] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[0].Descriptor.ShaderRegister = 0;
-	descriptionRootSignature.pParameters = rootParameters;
-	descriptionRootSignature.NumParameters = _countof(rootParameters);
-
-
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う//b0のbと一致する
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
+	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド//b0の0と一致する。もしb11と紐づけたいなら11となる
+	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters);//ルートパラメータ配列の長さ
 
 	// シリアライズしてバイナリにする
 	ID3DBlob* signatureBlob = nullptr;
@@ -426,8 +421,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// バイナリを元に生成
 	ID3D12RootSignature* rootSignature = nullptr;
 	hr = device->CreateRootSignature(
-		0,
-		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+		0,signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature));
 	assert(SUCCEEDED(hr));
 
@@ -560,10 +554,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	scissorRect.right = kClientWidth;
 	scissorRect.top = 0;
 	scissorRect.bottom = kClientHeight;
-
-
-
-
 
 	//ログのディレクトリを用意する
 	std::filesystem::create_directory("logs");
