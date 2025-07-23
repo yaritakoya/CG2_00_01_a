@@ -1008,6 +1008,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
+#pragma region IBV
+
+	ID3D12Resource* indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6);
+
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+	// リソースの先頭のアドレスから使う
+	indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
+	// 使用するリソースのサイズはインデックス6頂点分のサイズにする
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+	//インデックスはsize32_tとする
+	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+	// インデックスリソースにデータを書き込む
+	uint32_t* indexDataSprite = nullptr;
+	// 書き込むためのアドレス取得
+	indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+	// 左下
+	indexDataSprite[0] = 0;
+	indexDataSprite[1] = 1;
+	indexDataSprite[2] = 2;
+	// 左下2
+	indexDataSprite[3] = 3;
+	indexDataSprite[4] = 4;
+	indexDataSprite[5] = 5;
+
+#pragma endregion
+
+
 
 #pragma region ImGuiの初期化
 
@@ -1123,14 +1150,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion
 
 #pragma region 2Dの描画
+
 			//Spriteの描画。変更が必要なものだけ変更する
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // VBVを設定
 			//TransformationMatrixCBufferの場所を特定
 			commandList->SetGraphicsRootConstantBufferView(1, TransformationMatrixResourceSprite->GetGPUVirtualAddress());
 			// 描画！(DraoCall/ドローコール)。6頂点で1つのインスタンス
 			commandList->DrawInstanced(6, 1, 0, 0);
+
 #pragma endregion
 
+			commandList->IASetIndexBuffer(&indexBufferViewSprite); // IBVを設定
+			//描画！(DraoCall/ドローコール)。6個のインデックスを使用し1つのインスタンスを描画。その他は当面0でいい
+			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 			// 実際のcommandListのImGuiの描画コマンドを積む
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
