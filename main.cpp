@@ -1168,7 +1168,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::ShowDemoWindow();
 			ImGui::DragFloat("rotate.y", &transform.rotate.y, 0.1f);
 			ImGui::DragFloat3("transform", &transform.translate.x, 0.1f);
-			ImGui::DragFloat2("Sprite transform", &transformSprite.translate.x, 0.1f);
+			ImGui::DragFloat3("scale", &transform.scale.x, 0.1f);
+			ImGui::DragFloat2("Sprite transform", &transformSprite.translate.x, 1.0f);
+			ImGui::DragFloat2("Sprite scale", &transformSprite.scale.x, 0.1f);
 
 			// ゲームの処理
 
