@@ -1300,19 +1300,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     assert(SUCCEEDED(hr));
 
     // Textureを読んで転送する03_00
-    DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
+    DirectX::ScratchImage mipImages = LoadTexture("resources/fence.png");
     const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
     ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
     ID3D12Resource* intermediateResource =
         UploadTextureData(textureResource, mipImages, device, commandList); //?
 
-
-
     // --モデルデータを読み込む--
-    ModelData modelData = LoadObjFile("Resources", "plane.obj");
-
-
-
+    ModelData modelData = LoadObjFile("resources", "fence.obj");
 
     // 2枚目のTextureを読んで転送するCG2_05_01_page_8
     DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
@@ -1320,7 +1315,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ID3D12Resource* textureResource2 = CreateTextureResource(device, metadata2);
     ID3D12Resource* intermediateResource2 =
         UploadTextureData(textureResource2, mipImages2, device, commandList);
-
 
 #pragma region ディスクリプタサイズを取得する（SRV/RTV/DSV）
     // DescriptorSizeを取得しておくCG2_05_01_page_6
